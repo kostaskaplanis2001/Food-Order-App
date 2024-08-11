@@ -4,7 +4,7 @@ import Meals from "./components/Meals.jsx";
 function App() {
   return (
     <>
-      <Header />;
+      <Header />
       <Meals />
     </>
   );
