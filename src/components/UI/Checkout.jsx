@@ -23,7 +23,51 @@ export default function Checkout() {
     event.preventDefault();
 
     const fd = new FormData(event.target);
-    const customerData = Object.fromEntries(fd.entries()); // { email: test@example.com }
+
+    // Explicitly construct customer data to ensure field names match
+    const customerData = {
+      email: fd.get("email"),
+      name: fd.get("full-name"),
+      street: fd.get("street"),
+      "postal-code": fd.get("postal-code"),
+      city: fd.get("city"),
+    };
+
+    console.log("Submitting order:", {
+      items: cartCtx.items,
+      customer: customerData,
+    });
+
+    fetch("http://localhost:3000/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        order: {
+          items: cartCtx.items,
+          customer: customerData,
+        },
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((errorData) => {
+            throw new Error(
+              `Failed to submit the order: ${
+                errorData.message || response.status
+              }`
+            );
+          });
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Order submitted successfully:", data);
+      })
+      .catch((error) => {
+        console.error("Error submitting order:", error);
+      });
   }
 
   return (
@@ -41,7 +85,7 @@ export default function Checkout() {
 
         <p className="modal-actions">
           <Button textOnly>Close</Button>
-          <Button onClick={handleClose}>Submit Order</Button>
+          <Button type="submit">Submit Order</Button>
         </p>
       </form>
     </Modal>
