@@ -1,5 +1,6 @@
 import MealItem from "./MealItem";
 import useHttp from "../hooks/useHttp";
+import Error from "./UI/Error";
 
 const requestConfig = {};
 
@@ -11,11 +12,12 @@ function Meals() {
   } = useHttp("http://localhost:3000/meals", requestConfig, []);
 
   if (isLoading) {
-    return <p>Fetching meals...</p>;
+    return <p className="center">Fetching meals...</p>;
   }
 
-  console.log("loadedMeals", loadedMeals);
-
+  if (error) {
+    return <Error title="Failed to fetch meals" message={error} />;
+  }
   return (
     <ul id="meals">
       {loadedMeals.map((meal) => (
